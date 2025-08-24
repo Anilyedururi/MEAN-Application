@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         DH_USER = "anil1129"               // Jenkins Credentials (username)
-        DH_TOKEN = "dckr_pat_x7jzplutY27NlEZNmDyQM43HNvU" // Jenkins Credentials (token)
+        DH_TOKEN = "dckr_pat_BAaS91_s-yE7vl2oFpHTjPKShbw"
         FRONTEND_IMAGE = "${DH_USER}/my-frontend"
         BACKEND_IMAGE = "${DH_USER}/my-backend"
       VM_SSH_KEY = credentials('aws')       // SSH private key
