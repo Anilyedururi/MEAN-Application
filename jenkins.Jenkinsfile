@@ -38,7 +38,7 @@ pipeline {
                     sh """
                         echo "$VM_SSH_KEY" > key.pem
                         chmod 600 key.pem
-                        ssh -o StrictHostKeyChecking=no -i key.pem ${VM_USER}@${VM_HOST} '
+                        ssh -o StrictHostKeyChecking=no -i ${VM_SSH_KEY} ${VM_USER}@${VM_HOST} '
                             cd ~/apps/my-app/deploy &&
                             docker compose pull &&
                             docker compose up -d &&
