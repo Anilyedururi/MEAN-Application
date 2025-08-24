@@ -5,15 +5,9 @@ pipeline {
         DH_TOKEN = credentials('dckr_pat_x7jzplutY27NlEZNmDyQM43HNvU')           // Jenkins Credentials
         FRONTEND_IMAGE = "${DH_USER}/my-frontend"
         BACKEND_IMAGE = "${DH_USER}/my-backend"
-
         VM_SSH_KEY = credentials('vm-ssh-key')               // SSH private key
     }
     stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'main', credentialsId: 'github', url: 'https://github.com/Anilyedururi/MEAN-Application.git'
-            }
-        }
         stage('Build & Push Frontend') {
             steps {
                 script {
@@ -52,7 +46,6 @@ pipeline {
                 }
             }
         }
-    }
     post {
         always {
             sh 'docker logout || true'
