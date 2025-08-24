@@ -5,7 +5,7 @@ pipeline {
         DH_TOKEN = credentials('dckr_pat_x7jzplutY27NlEZNmDyQM43HNvU')           // Jenkins Credentials
         FRONTEND_IMAGE = "${DH_USER}/my-frontend"
         BACKEND_IMAGE = "${DH_USER}/my-backend"
->>>>>>> 14444dd1482062bdf85c9e511176137266e65109
+
         VM_SSH_KEY = credentials('vm-ssh-key')               // SSH private key
     }
     stages {
