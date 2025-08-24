@@ -36,7 +36,7 @@ pipeline {
             steps {
                 script {
                     sh """
-echo "$VM_SSH_KEY" > key.pem
+echo "$VM_SSH_KEY" > Discover-Dollor.pem
 chmod 600 key.pem
 ssh -o StrictHostKeyChecking=no -i key.pem ${VM_USER}@${VM_HOST} '
     cd ~/apps/my-app/deploy &&
