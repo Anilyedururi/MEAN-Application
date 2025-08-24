@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: git branch: 'main', credentialsId: 'github', url: 'https://github.com/Anilyedururi/MEAN-Application.git'
+                git branch: 'main', credentialsId: 'github', url: 'https://github.com/Anilyedururi/MEAN-Application.git'
             }
         }
         stage('Build & Push Frontend') {
