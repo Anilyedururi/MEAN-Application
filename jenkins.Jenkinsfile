@@ -36,14 +36,14 @@ pipeline {
             steps {
                 script {
                     sh """
-                        echo "$VM_SSH_KEY" > key.pem
-                        chmod 600 key.pem
-                        ssh -o StrictHostKeyChecking=no -i ${VM_SSH_KEY} ${VM_USER}@${VM_HOST} '
-                            cd ~/apps/my-app/deploy &&
-                            docker compose pull &&
-                            docker compose up -d &&
-                            docker image prune -f
-                        '
+echo "$VM_SSH_KEY" > key.pem
+chmod 600 key.pem
+ssh -o StrictHostKeyChecking=no -i key.pem ${VM_USER}@${VM_HOST}
+    cd ~/apps/my-app/deploy &&
+    docker compose pull &&
+    docker compose up -d &&
+    docker image prune -f
+
                     """
                 }
             }
