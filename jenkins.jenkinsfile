@@ -3,8 +3,9 @@ pipeline {
     environment {
         DH_USER = credentials('anil1129')         // Jenkins Credentials
         DH_TOKEN = credentials('dckr_pat_x7jzplutY27NlEZNmDyQM43HNvU')           // Jenkins Credentials
-        FRONTEND_IMAGE = "${anil1129}/my-frontend"
-        BACKEND_IMAGE = "${anil1129}/my-backend"
+        FRONTEND_IMAGE = "${DH_USER}/my-frontend"
+        BACKEND_IMAGE = "${DH_USER}/my-backend"
+>>>>>>> 14444dd1482062bdf85c9e511176137266e65109
         VM_SSH_KEY = credentials('vm-ssh-key')               // SSH private key
     }
     stages {
@@ -41,7 +42,7 @@ pipeline {
                     sh """
                         echo "$VM_SSH_KEY" > key.pem
                         chmod 600 key.pem
-                        ssh -o StrictHostKeyChecking=no -i ${VM_SSH_KEY}  anil@ 13.222.222.128'
+                        ssh -o StrictHostKeyChecking=no -i ${VM_USER}anil@ 13.222.222.128'
                             cd ~/apps/my-app/deploy &&
                             docker compose pull &&
                             docker compose up -d &&
