@@ -1,13 +1,13 @@
 pipeline {
     agent any
     environment {
-        DH_USER = credentials('anil1129')               // Jenkins Credentials (username)
-        DH_TOKEN = credentials('dckr_pat_x7jzplutY27NlEZNmDyQM43HNvU')   // Jenkins Credentials (token)
+        DH_USER = "anil1129"               // Jenkins Credentials (username)
+        DH_TOKEN = "dckr_pat_x7jzplutY27NlEZNmDyQM43HNvU" // Jenkins Credentials (token)
         FRONTEND_IMAGE = "${DH_USER}/my-frontend"
         BACKEND_IMAGE = "${DH_USER}/my-backend"
         VM_SSH_KEY = credentials('vm-ssh-key')          // SSH private key
-        VM_USER = 'anil'                                 // VM SSH username (add this explicitly)
-        VM_HOST = '13.222.222.128'                       // VM IP or hostname (add this explicitly)
+        VM_USER = "anil"                            // VM SSH username (add this explicitly)
+        VM_HOST = "13.222.222.128"                       // VM IP or hostname (add this explicitly)
     }
     stages {
         stage('Build & Push Frontend') {
