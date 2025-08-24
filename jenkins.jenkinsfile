@@ -1,12 +1,10 @@
 pipeline {
     agent any
     environment {
-        DH_USER = credentials('dockerhub-username')         // Jenkins Credentials
-        DH_TOKEN = credentials('dockerhub-token')           // Jenkins Credentials
-        FRONTEND_IMAGE = "${DH_USER}/my-frontend"
-        BACKEND_IMAGE = "${DH_USER}/my-backend"
-        VM_HOST = credentials('vm-host')                     // Or a plain string parameter
-        VM_USER = credentials('vm-user')
+        DH_USER = credentials('anil1129')         // Jenkins Credentials
+        DH_TOKEN = credentials('dckr_pat_x7jzplutY27NlEZNmDyQM43HNvU')           // Jenkins Credentials
+        FRONTEND_IMAGE = "${anil1129}/my-frontend"
+        BACKEND_IMAGE = "${anil1129}/my-backend"
         VM_SSH_KEY = credentials('vm-ssh-key')               // SSH private key
     }
     stages {
@@ -19,7 +17,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                        echo "$DH_TOKEN" | docker login -u "$DH_USER" --password-stdin
+                        echo "$dckr_pat_x7jzplutY27NlEZNmDyQM43HNvU" | docker login -u "$anil1129" --password-stdin
                         docker build -t $FRONTEND_IMAGE:latest ./frontend
                         docker push $FRONTEND_IMAGE:latest
                     """
@@ -30,7 +28,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                        echo "$DH_TOKEN" | docker login -u "$DH_USER" --password-stdin
+                        echo "$dckr_pat_x7jzplutY27NlEZNmDyQM43HNvU" | docker login -u "$anil1129" --password-stdin
                         docker build -t $BACKEND_IMAGE:latest ./backend
                         docker push $BACKEND_IMAGE:latest
                     """
@@ -43,7 +41,7 @@ pipeline {
                     sh """
                         echo "$VM_SSH_KEY" > key.pem
                         chmod 600 key.pem
-                        ssh -o StrictHostKeyChecking=no -i key.pem ${VM_USER}@${VM_HOST} '
+                        ssh -o StrictHostKeyChecking=no -i ${VM_SSH_KEY}  anil@ 13.222.222.128'
                             cd ~/apps/my-app/deploy &&
                             docker compose pull &&
                             docker compose up -d &&
