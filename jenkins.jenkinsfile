@@ -1,0 +1,55 @@
+pipeline {
+  agent any
+  environment {
+    DH_USER = credentials('dockerhub-username')        // Jenkins Credentials
+    DH_TOKEN = credentials('dockerhub-token')          // Jenkins Credentials
+    FRONTEND_IMAGE = "${DH_USER}/my-frontend"
+    BACKEND_IMAGE  = "${DH_USER}/my-backend"
+    VM_HOST = credentials('vm-host')                   // Or a plain string parameter
+    VM_USER = credentials('vm-user')
+    VM_SSH_KEY = credentials('vm-ssh-key')             // SSH private key
+  }
+  stages {
+    stage('Checkout') {
+      steps { checkout scm }
+    }
+    stage('Build & Push Frontend') {
+      steps {
+        sh '''
+          echo "$DH_TOKEN" | docker login -u "$DH_USER" --password-stdin
+          docker build -t $FRONTEND_IMAGE:latest ./frontend
+          docker push $FRONTEND_IMAGE:latest
+        '''
+      }
+    }
+    stage('Build & Push Backend') {
+      steps {
+        sh '''
+          echo "$DH_TOKEN" | docker login -u "$DH_USER" --password-stdin
+          docker build -t $BACKEND_IMAGE:latest ./backend
+          docker push $BACKEND_IMAGE:latest
+        '''
+      }
+    }
+    stage('Deploy to VM') {
+      steps {
+        sh '''
+          # Install sshpass or use ssh-agent with private key credentials
+          echo "$VM_SSH_KEY" > key.pem
+          chmod 600 key.pem
+          ssh -o StrictHostKeyChecking=no -i key.pem ${VM_USER}@${VM_HOST} '
+            cd ~/apps/my-app/deploy &&
+            docker compose pull &&
+            docker compose up -d &&
+            docker image prune -f
+          '
+        '''
+      }
+    }
+  }
+  post {
+    always {
+      sh 'docker logout || true'
+      sh 'rm -f key.pem || true'
+    }
+}
