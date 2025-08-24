@@ -26,7 +26,7 @@ pipeline {
                 script {
                     sh """
                         echo "$DH_TOKEN" | docker login -u "$DH_USER" --password-stdin
-                        docker build -t $BACKEND_IMAGE:latest ./myapp
+                        docker build -t $BACKEND_IMAGE:latest ./backend
                         docker push $BACKEND_IMAGE:latest
                     """
                 }
