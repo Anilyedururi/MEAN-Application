@@ -37,7 +37,7 @@ pipeline {
                 script {
                     sh """
 echo "$VM_SSH_KEY" > Discover-Dollor.pem
-chmod 600 key.pem
+chmod 600 Discover-Dollor.pem
 ssh -o StrictHostKeyChecking=no -i Discover-Dollor.pem ${VM_USER}@${VM_HOST} '
     cd ~/apps/my-app/deploy &&
     docker compose pull &&
