@@ -1,24 +1,20 @@
-version : "3.8"
+version: "3.8"
 services:
-  service1:
+  backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
     ports:
-     - "8080:8080"
-  service2:
+      - "8080:8080"
+  frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
     ports:
       - "80:80"
-  service3:
-    mongo:
-      image: mongo:latest
-      volumes:
-        - mongo-data:/data/db
-      ports:
-        -"27017:27017"
-  volumes:
-    mongo-data
-    
+  mongo:
+    image: mongo:latest
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+volumes:
+  mongo-data:
