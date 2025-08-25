@@ -1,18 +1,23 @@
 pipeline {
     agent any
     environment {
-        DH_USER = "anil1129"               // Jenkins Credentials (username)
-        DH_TOKEN = "dckr_pat_BAaS91_s-yE7vl2oFpHTjPKShbw"
-        FRONTEND_IMAGE = "${DH_USER}/my-frontend"
-        BACKEND_IMAGE = "${DH_USER}/my-backend"
-      VM_SSH_KEY = credentials('aws')       // SSH private key
-        VM_USER = "anil"                            // VM SSH username (add this explicitly)
-        VM_HOST = "13.222.222.128"                       // VM IP or hostname (add this explicitly)
-    }
+        DH_USER = 'anil1129'            
+        DH_TOKEN = 'dckr_pat_JLhgEkOQl4NL7DuJXPhjjuona4Q'  
+        FRONTEND_IMAGE = "${DH_USER}/frontapp"
+        BACKEND_IMAGE = "${DH_USER}/myapp"
+        VM_SSH_KEY = 'ubuntu (aws-key)'         
+        VM_USER = 'ubuntu'                                 
+        VM_HOST = '52.70.128.109'                       
+    }    
     stages {
-        stage('Build & Push Frontend') {
-            steps {
-                script {
+        stage ("git checkout"){
+            steps{
+                git branch: 'main', credentialsId: 'github', url: 'https://github.com/Anilyedururi/Mean.git'
+            }
+        }
+        stage ('build frontend image'){
+            steps{
+                script{
                     sh """
                         echo "$DH_TOKEN" | docker login -u "$DH_USER" --password-stdin
                         docker build -t $FRONTEND_IMAGE:latest ./frontend
@@ -21,12 +26,12 @@ pipeline {
                 }
             }
         }
-        stage('Build & Push Backend') {
-            steps {
-                script {
+        stage ('build backend image'){
+            steps{
+                script{
                     sh """
                         echo "$DH_TOKEN" | docker login -u "$DH_USER" --password-stdin
-                        docker build -t $BACKEND_IMAGE:latest ./backend
+                        docker build -t $BACKEND_IMAGE:latest ./frontend
                         docker push $BACKEND_IMAGE:latest
                     """
                 }
@@ -36,19 +41,24 @@ pipeline {
             steps {
                 script {
                     sh """
-echo "$VM_SSH_KEY" > Discover-Dollor.pem
-chmod 600 Discover-Dollor.pem
-ssh -o StrictHostKeyChecking=no -i Discover-Dollor.pem ${VM_USER}@${VM_HOST} '
-    cd ~/apps/my-app/deploy &&
-    docker compose pull &&
-    docker compose up -d &&
-    docker image prune -f
-'
-
-
+                        echo "$VM_SSH_KEY" > key.pem
+                        chmod 600 key.pem
+                        ssh -o StrictHostKeyChecking=no -i key.pem ${VM_USER}@${VM_HOST} '
+                            cd ~/apps/my-app/deploy &&
+                            docker compose pull &&
+                            docker compose up -d &&
+                            docker image prune -f
+                        '
+                        
                     """
                 }
             }
+        }
+    }
+    post {
+        always {
+            sh 'docker logout || true'
+            sh 'rm -f key.pem || true'
         }
     }
 }
