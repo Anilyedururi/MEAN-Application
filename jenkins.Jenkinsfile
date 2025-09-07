@@ -1,64 +1,49 @@
 pipeline {
     agent any
     environment {
-        DH_USER = 'anil1129'            
-        DH_TOKEN = 'dckr_pat_JLhgEkOQl4NL7DuJXPhjjuona4Q'  
         FRONTEND_IMAGE = "${DH_USER}/frontapp"
         BACKEND_IMAGE = "${DH_USER}/myapp"
-        VM_SSH_KEY = 'ubuntu (aws-key)'         
-        VM_USER = 'ubuntu'                                 
-        VM_HOST = '52.70.128.109'                       
     }    
-    stages {
-        stage ("git checkout"){
+    stages{
+        stage("checkout"){
             steps{
                 git branch: 'main', credentialsId: 'github', url: 'https://github.com/Anilyedururi/Mean.git'
             }
         }
-        stage ('build frontend image'){
+        stage("build image-f"){
             steps{
-                script{
-                    sh """
-                        echo "$DH_TOKEN" | docker login -u "$DH_USER" --password-stdin
-                        docker build -t $FRONTEND_IMAGE:latest ./frontend
-                        docker push $FRONTEND_IMAGE:latest
-                    """
+                withCredentials([usernamePassword(credentialsId: 'Dockerhub', passwordVariable: 'docker_password', usernameVariable: 'docker_user')]) {
+                    sh "docker build -t anil1129/frontapp:1.1 ./frontend "
+                    sh "docker login -u ${docker_user} -p ${docker_password}"
+                    sh  "docker push anil1129/frontapp:1.1"
                 }
             }
         }
-        stage ('build backend image'){
+        stage("build image-b"){
             steps{
-                script{
-                    sh """
-                        echo "$DH_TOKEN" | docker login -u "$DH_USER" --password-stdin
-                        docker build -t $BACKEND_IMAGE:latest ./frontend
-                        docker push $BACKEND_IMAGE:latest
-                    """
+                withCredentials([usernamePassword(credentialsId: 'Dockerhub', passwordVariable: 'docker_password', usernameVariable: 'docker_user')]) {
+                    sh "docker build -t anil1129/backapp:1.2 ./backend" 
+                    sh "docker login -u ${docker_user} -p ${docker_password}"
+                    sh  "docker push anil1129/backapp:1.2"
                 }
-            }
+            }   
         }
-        stage('Deploy to VM') {
-            steps {
-                script {
-                    sh """
-                        echo "$VM_SSH_KEY" > key.pem
-                        chmod 600 key.pem
-                        ssh -o StrictHostKeyChecking=no -i key.pem ${VM_USER}@${VM_HOST} '
-                            cd ~/apps/my-app/deploy &&
-                            docker compose pull &&
-                            docker compose up -d &&
+        stage("deploy vm"){
+            steps{
+                sshagent(['AWS-cred']) {
+                    sh"""
+                        ssh -o StrictHostKeyChecking=no ubuntu@172.31.84.99 "
+                            docker rm -f frontapp
+                            mkdir -p ~/apps/my-app/deploy
+                            cd ~/apps/my-app/deploy
+                            docker run -d -p 80:80 anil1129/frontapp:1.1
+                            docker-compose pull
+                            docker-compose up -d
                             docker image prune -f
-                        '
-                        
+                        "
                     """
                 }
             }
-        }
-    }
-    post {
-        always {
-            sh 'docker logout || true'
-            sh 'rm -f key.pem || true'
         }
     }
 }
